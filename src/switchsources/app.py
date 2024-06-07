@@ -61,13 +61,13 @@ def switch(name: str):
 def check(name: str):
     cur_switcher = switcher.switcher_factory(name)
     res = cur_switcher.check() 
-    print(res.stdout.decode('utf-8'))
+    print(res)
 
 @app.command()
 def recover(name: str):
     cur_switcher = switcher.switcher_factory(name)
     res = cur_switcher.recover() 
-    print(res.stdout.decode('utf-8'))
+    print(res)
 
 if __name__ == '__main__':
     app()

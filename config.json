@@ -5,6 +5,8 @@
         "https://pypi.douban.com/simple",
         "https://pypi.mirrors.ustc.edu.cn/simple"
     ],
-    "maven": [],
+    "maven": [
+        "https://maven.aliyun.com/repository/public"
+    ],
     "npm": []
 }
