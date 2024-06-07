@@ -1,5 +1,5 @@
 {
-    "mac":{
+    "Linux":{
         "pip":{
             "check": {
                 "sh": "pip config get global.index-url"
@@ -16,12 +16,18 @@
             "recover": {
                 "sh": "pip config unset global.index-url"
             }
+        },
+        "maven":{
+
+        },
+        "npm":{
+
         }
     },
-    "windows":{
+    "Windows":{
 
     },
-    "linux":{
+    "Darwin":{
 
     }
 }
