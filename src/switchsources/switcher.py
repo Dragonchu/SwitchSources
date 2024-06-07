@@ -49,6 +49,10 @@ class MavenSwitcher(BaseSwitcher):
     def __init__(self, name):
         super().__init__(name)
         self.mirror_id = 'switchsources-mirror'
+        self.namespace = {'mvn': 'http://maven.apache.org/SETTINGS/1.2.0'}
+        ET.register_namespace('', "http://maven.apache.org/SETTINGS/1.2.0")
+        ET.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
+        ET.register_namespace('schemaLocation', "http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd")
 
     def check(self) -> str:
         path = self._get_maven_settings_path()
@@ -68,7 +72,7 @@ class MavenSwitcher(BaseSwitcher):
     def _check_maven_repository(self, settings_file):
         tree = ET.parse(settings_file)
         root = tree.getroot()
-        mirrors = root.find('mirrors')
+        mirrors = root.find('mvn:mirrors', namespaces=self.namespace)
         if mirrors is None:
             return None
         for mirror in mirrors:
@@ -79,13 +83,13 @@ class MavenSwitcher(BaseSwitcher):
     def _del_maven_repository(self, settings_file):
         tree = ET.parse(settings_file)
         root = tree.getroot()
-        mirrors = root.find('mirrors')
+        mirrors = root.find('mvn:mirrors', namespaces=self.namespace)
         if mirrors is None:
             return
         for mirror in mirrors:
             if mirror.find('id').text == self.mirror_id:
                 mirrors.remove(mirror)
-        tree.write(settings_file, encoding='utf-8')
+        tree.write(settings_file)
 
     def _get_maven_settings_path(self):
         home_dir = os.path.expanduser("~")
