@@ -1,6 +1,7 @@
 <p align="center">
   <br> 中文 | <a href="README-EN.md">English</a>
   <br>One click, Switch all<br>
+  <br>轻量级，可配置，跨平台的换源工具<br>
 </p>
 
 # SwitchSources
