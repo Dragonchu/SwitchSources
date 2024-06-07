@@ -1,12 +1,14 @@
 import json
-import subprocess
 import os
+import platform
+import subprocess
+
+import inquirer
+import switcher
 import typer
+from config import Config
 from rich import print
 from rich.table import Table
-from config import Config
-import inquirer
-import platform
 
 app = typer.Typer()
 
@@ -15,9 +17,7 @@ current_script_path = os.path.realpath(__file__)
 current_dir = os.path.dirname(current_script_path)
 config_path = os.path.join(current_dir, '../../config.json')
 
-config = Config(config_path)
-cur_platform = platform.system()
-cur_platform_config = config.get_config(cur_platform)
+config = Config(config_path).get_config()
 
 
 def run_command(command):
@@ -28,7 +28,7 @@ def run_command(command):
 def list():
     soft_worms = []
     soft_worms = Table(show_header=False, show_lines=True)
-    for v in cur_platform_config:
+    for k,v in enumerate(config):
         soft_worms.add_row(v)
     print(soft_worms)
 
@@ -37,15 +37,15 @@ def list():
 def show(name: str):
     soft_worms = []
     soft_worms = Table(show_header=False, header_style='bold',show_lines=True)
-    software = cur_platform_config[name]["switch"]["sources"]
-    for v in software:
+    sources = config[name]
+    for v in sources:
         soft_worms.add_row(v)
     print(soft_worms)
 
 @app.command()
 def switch(name: str):
-    command = cur_platform_config[name]["switch"]["sh"]
-    sources = cur_platform_config[name]["switch"]["sources"]
+    cur_switcher = switcher.switcher_factory(name)
+    sources = config[name]
     questions = [
         inquirer.List('source',
                       message="Select Source",
@@ -54,21 +54,19 @@ def switch(name: str):
                   ),
     ]
     answers = inquirer.prompt(questions)
-    res = run_command(f"{command} {answers['source']}")
-    print(res.stdout.decode('utf-8'))
-    print(f"Switched to {answers['source']}")
+    cur_switcher.switch(answers['source']) 
 
 
 @app.command()
 def check(name: str):
-    command = cur_platform_config[name]["check"]["sh"]
-    res = run_command(f"{command}")
+    cur_switcher = switcher.switcher_factory(name)
+    res = cur_switcher.check() 
     print(res.stdout.decode('utf-8'))
 
 @app.command()
 def recover(name: str):
-    command = cur_platform_config[name]["recover"]["sh"]
-    res = run_command(f"{command}")
+    cur_switcher = switcher.switcher_factory(name)
+    res = cur_switcher.recover() 
     print(res.stdout.decode('utf-8'))
 
 if __name__ == '__main__':

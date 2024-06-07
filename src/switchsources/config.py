@@ -12,9 +12,11 @@ class Config:
             with open(self.config_path, 'r') as config_file:
                 self.config = json.load(config_file)
 
-    def get_config(self, key):
+    def get_config(self, key=None):
         if not self.config:
             self.load_config()
+        if not key:
+            return self.config
         return self.config.get(key)
 
     def set_config(self, key, value):

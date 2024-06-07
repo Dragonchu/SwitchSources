@@ -1,33 +1,10 @@
 {
-    "Linux":{
-        "pip":{
-            "check": {
-                "sh": "pip config get global.index-url"
-            },
-            "switch": {
-                "sh":  "pip config set global.index-url",
-                "sources": [
-                    "https://pypi.tuna.tsinghua.edu.cn/simple",
-                    "https://mirrors.aliyun.com/pypi/simple",
-                    "https://pypi.douban.com/simple",
-                    "https://pypi.mirrors.ustc.edu.cn/simple"
-                ]
-            },
-            "recover": {
-                "sh": "pip config unset global.index-url"
-            }
-        },
-        "maven":{
-
-        },
-        "npm":{
-
-        }
-    },
-    "Windows":{
-
-    },
-    "Darwin":{
-
-    }
+    "pip": [
+        "https://pypi.tuna.tsinghua.edu.cn/simple",
+        "https://mirrors.aliyun.com/pypi/simple",
+        "https://pypi.douban.com/simple",
+        "https://pypi.mirrors.ustc.edu.cn/simple"
+    ],
+    "maven": [],
+    "npm": []
 }
