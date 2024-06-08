@@ -6,8 +6,8 @@ import typer
 from rich import print
 from rich.table import Table
 
-import switcher
-from config import Config
+import switchsources.switcher as switcher
+from switchsources.config import Config
 
 app = typer.Typer()
 
@@ -24,7 +24,6 @@ def run_command(command):
 
 @app.command()
 def ls():
-    soft_worms = []
     soft_worms = Table(show_header=False, show_lines=True)
     for k, v in enumerate(config):
         soft_worms.add_row(v)
@@ -33,7 +32,6 @@ def ls():
 
 @app.command()
 def show(name: str):
-    soft_worms = []
     soft_worms = Table(show_header=False, header_style='bold', show_lines=True)
     sources = config[name]
     for v in sources:
@@ -70,5 +68,9 @@ def recover(name: str):
     print(res)
 
 
-if __name__ == '__main__':
+def main():
     app()
+
+
+if __name__ == '__main__':
+    main()
