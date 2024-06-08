@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import re
 import shutil
 
+
 def switcher_factory(name):
     if name == 'pip':
         return PipSwitcher(name)
@@ -14,6 +15,7 @@ def switcher_factory(name):
         return MavenSwitcher(name)
     else:
         raise ValueError(f"Unknown switcher: {name}")
+
 
 class BaseSwitcher(abc.ABC):
     def __init__(self, name):
@@ -24,26 +26,31 @@ class BaseSwitcher(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def switch(self):
+    def switch(self, source: str):
         pass
 
     @abc.abstractmethod
     def recover(self) -> str:
         pass
 
+
 class PipSwitcher(BaseSwitcher):
     def check(self) -> str:
-        return subprocess.run("pip config get global.index-url", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+        return subprocess.run("pip config get global.index-url", shell=True, check=True, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE).stdout.decode('utf-8')
 
     def switch(self, source: str):
         try:
-            subprocess.run(f"pip config set global.index-url {source}", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(f"pip config set global.index-url {source}", shell=True, check=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
             print(f"Switched to {source}")
         except subprocess.CalledProcessError:
             print(f"Failed to switch to {source}")
 
     def recover(self) -> str:
-        return subprocess.run("pip config unset global.index-url", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode('utf-8')
+        return subprocess.run("pip config unset global.index-url", shell=True, check=True, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE).stdout.decode('utf-8')
+
 
 class MavenSwitcher(BaseSwitcher):
     def __init__(self, name):
@@ -52,23 +59,24 @@ class MavenSwitcher(BaseSwitcher):
         self.namespace = {'mvn': 'http://maven.apache.org/SETTINGS/1.2.0'}
         ET.register_namespace('', "http://maven.apache.org/SETTINGS/1.2.0")
         ET.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
-        ET.register_namespace('schemaLocation', "http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd")
+        ET.register_namespace('schemaLocation',
+                              "http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd")
 
     def check(self) -> str:
         path = self._get_maven_settings_path()
         print(path)
         return self._check_maven_repository(path)
-    
+
     def switch(self, source: str):
         path = self._get_maven_settings_path()
         self._change_maven_repository(path, source)
         print(f"Switched to {source}")
-    
+
     def recover(self) -> str:
         path = self._get_maven_settings_path()
         self._del_maven_repository(path)
         return "Recovered to default maven repository"
-    
+
     def _check_maven_repository(self, settings_file):
         tree = ET.parse(settings_file)
         root = tree.getroot()
@@ -125,10 +133,9 @@ class MavenSwitcher(BaseSwitcher):
             return match.group(1)
         else:
             return None
-    
+
     def _create_new_mvn_settings(self):
         mvn_home = self._get_mvn_install_location()
         src = os.path.join(mvn_home, 'conf', 'settings.xml')
         dest = self._get_maven_settings_path()
         shutil.copy2(src, dest)
-
