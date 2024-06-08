@@ -10,6 +10,23 @@
 
 SwitchSources是一个帮助开发者切换各种软件源的工具。
 
+## 使用
+
+查看支持的软件
+```shell
+switchsources ls
+```
+
+查看当前软件源
+```shell
+switchsources check pip
+```
+
+切换软件源
+```shell
+switchsources switch pip
+```
+
 ## 规划
 
 - [ ] 支持maven, pip, npm等常见的开源工具的换源
