@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "switchsources"
-version = "0.1.0"
+version = "0.2.0"
 description = "A tool to switch sources"
 authors = ["Dragonchu"]
 readme = "README.md"
@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.10"
 typer = "^0.12.3"
 inquirer = "^3.2.4"
+platformdirs = "^4.2.2"
 
 [tool.poetry.scripts]
 switchsources = "switchsources.app:main"

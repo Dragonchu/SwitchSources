@@ -1,5 +1,6 @@
 import json
-
+from platformdirs import *
+import os
 
 class Config:
     def __init__(self, config_path):
@@ -27,3 +28,14 @@ class Config:
     def save_config(self):
         with open(self.config_path, 'w') as config_file:
             json.dump(self.config, config_file, indent=4)
+
+appname = 'switchsources'
+appauthor = 'Dragonchu'
+config_dir = user_config_dir(appname, appauthor)
+config_path = os.path.join(config_dir, 'config.json')
+if not os.path.exists(config_path):
+    os.makedirs(config_dir)
+    with open(config_path, 'w') as f:
+        f.write(json.dumps({}))
+
+source_config = Config(config_path)

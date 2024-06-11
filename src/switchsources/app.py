@@ -1,21 +1,17 @@
-import os
+
 import subprocess
+import json
 
 import inquirer
 import typer
 from rich import print
 from rich.table import Table
 
+
 import switchsources.switcher as switcher
-from switchsources.config import Config
+from switchsources.config import source_config
 
 app = typer.Typer()
-
-current_script_path = os.path.realpath(__file__)
-current_dir = os.path.dirname(current_script_path)
-config_path = os.path.join(current_dir, '../../config.json')
-
-config = Config(config_path).get_config()
 
 
 def run_command(command):
@@ -25,7 +21,7 @@ def run_command(command):
 @app.command()
 def ls():
     soft_worms = Table(show_header=False, show_lines=True)
-    for k, v in enumerate(config):
+    for k, v in enumerate(source_config.get_config()):
         soft_worms.add_row(v)
     print(soft_worms)
 
@@ -33,7 +29,7 @@ def ls():
 @app.command()
 def show(name: str):
     soft_worms = Table(show_header=False, header_style='bold', show_lines=True)
-    sources = config[name]
+    sources = source_config.get_config()[name]
     for v in sources:
         soft_worms.add_row(v)
     print(soft_worms)
@@ -42,7 +38,7 @@ def show(name: str):
 @app.command()
 def switch(name: str):
     cur_switcher = switcher.switcher_factory(name)
-    sources = config[name]
+    sources = source_config.get_config()[name]
     questions = [
         inquirer.List('source',
                       message="Select Source",
@@ -67,6 +63,32 @@ def recover(name: str):
     res = cur_switcher.recover()
     print(res)
 
+@app.command()
+def add(name: str, source: str):
+    if name not in source_config.get_config():
+        source_config.get_config()[name] = []
+    source_config.get_config()[name].append(source)
+    print(source_config.get_config())
+    source_config.save_config()
+
+@app.command()
+def remove(name: str):
+    del source_config.get_config()[name]
+    source_config.save_config()
+
+@app.command()
+def rs(name: str):
+    sources = source_config.get_config()
+    questions = [
+        inquirer.List('source',
+                      message="Select Source",
+                      choices=sources[name],
+                      carousel=True
+                      ),
+    ]
+    answers = inquirer.prompt(questions)
+    source_config.get_config()[name].remove(answers['source'])
+    source_config.save_config()
 
 def main():
     app()
