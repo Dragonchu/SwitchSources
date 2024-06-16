@@ -1,12 +1,9 @@
-
 import subprocess
-import json
 
 import inquirer
 import typer
 from rich import print
 from rich.table import Table
-
 
 import switchsources.switcher as switcher
 from switchsources.config import source_config
@@ -63,6 +60,7 @@ def recover(name: str):
     res = cur_switcher.recover()
     print(res)
 
+
 @app.command()
 def add(name: str, source: str):
     if name not in source_config.get_config():
@@ -71,10 +69,12 @@ def add(name: str, source: str):
     print(source_config.get_config())
     source_config.save_config()
 
+
 @app.command()
 def remove(name: str):
     del source_config.get_config()[name]
     source_config.save_config()
+
 
 @app.command()
 def rs(name: str):
@@ -89,6 +89,7 @@ def rs(name: str):
     answers = inquirer.prompt(questions)
     source_config.get_config()[name].remove(answers['source'])
     source_config.save_config()
+
 
 def main():
     app()

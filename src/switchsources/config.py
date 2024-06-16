@@ -2,6 +2,7 @@ import json
 from platformdirs import *
 import os
 
+
 class Config:
     def __init__(self, config_path):
         self.config_path = config_path
@@ -28,6 +29,7 @@ class Config:
     def save_config(self):
         with open(self.config_path, 'w') as config_file:
             json.dump(self.config, config_file, indent=4)
+
 
 appname = 'switchsources'
 appauthor = 'Dragonchu'
