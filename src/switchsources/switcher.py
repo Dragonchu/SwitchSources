@@ -53,14 +53,6 @@ class PipSwitcher(BaseSwitcher):
                               stderr=subprocess.PIPE).stdout.decode('utf-8')
 
 
-def _get_maven_settings_path():
-    home_dir = os.path.expanduser("~")
-    default_location = os.path.join(home_dir, ".m2", "settings.xml")
-    if os.path.exists(default_location):
-        return default_location
-    return _get_mvn_settings_install_location()
-
-
 def _get_mvn_settings_install_location():
     output = subprocess.check_output(['mvn', '-v']).decode('utf-8')
     match = re.search(r'Maven home: (.*)', output)
@@ -69,6 +61,14 @@ def _get_mvn_settings_install_location():
         return os.path.join(mvn_home, 'conf', 'settings.xml')
     else:
         return None
+
+
+def _get_maven_settings_path():
+    home_dir = os.path.expanduser("~")
+    default_location = os.path.join(home_dir, ".m2", "settings.xml")
+    if os.path.exists(default_location):
+        return default_location
+    return _get_mvn_settings_install_location()
 
 
 def _create_new_mvn_settings():
