@@ -37,8 +37,11 @@ class BaseSwitcher(abc.ABC):
 
 class PipSwitcher(BaseSwitcher):
     def check(self) -> str:
-        return subprocess.run("pip config get global.index-url", shell=True, check=True, stdout=subprocess.PIPE,
+        try:
+            return subprocess.run("pip config get global.index-url", shell=True, check=True, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE).stdout.decode('utf-8')
+        except subprocess.CalledProcessError:
+            return "No custom index-url found"
 
     def switch(self, source: str):
         try:
@@ -92,7 +95,7 @@ class MavenSwitcher(BaseSwitcher):
 
     def check(self) -> str:
         path = _get_maven_settings_path()
-        print(path)
+        print("maven setting file location: ",path)
         return self._check_maven_repository(path)
 
     def switch(self, source: str):
@@ -114,7 +117,7 @@ class MavenSwitcher(BaseSwitcher):
         for mirror in mirrors:
             if mirror.find('mvn:id', namespaces=self.namespace).text == self.mirror_id:
                 return mirror.find('mvn:url', namespaces=self.namespace).text
-        return None
+        return "No mirror found in settings.xml"
 
     def _del_maven_repository(self, settings_file):
         tree = ET.parse(settings_file)
