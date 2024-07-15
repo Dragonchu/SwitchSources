@@ -1,9 +1,14 @@
 import subprocess
+import time
 
 import inquirer
+import requests
 import typer
 from rich import print
+from rich.console import Console
+from ping3 import ping
 from rich.table import Table
+from rich.text import Text
 
 import switchsources.switcher as switcher
 from switchsources.config import source_config
@@ -89,6 +94,31 @@ def rs(name: str):
     answers = inquirer.prompt(questions)
     source_config.get_config()[name].remove(answers['source'])
     source_config.save_config()
+
+
+@app.command()
+def speed(name: str):
+    sources = source_config.get_config()[name]
+    console = Console()
+    table = Table(title="URL Latency Test Result")
+    table.add_column("Host", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Latency (s)", justify="right", style="green")
+    for source in sources:
+        try:
+            # Send a ping request to the host
+            latency = ping(source)
+            if latency is not None:
+                # Display the result in a friendly format
+                table.add_row(source, f"{latency:.4f}")
+            else:
+                # Handle unreachable host
+                error_text = Text(f"Failed to reach {source}: Host is unreachable", style="bold red")
+                console.print(error_text)
+        except Exception as e:
+            # Handle any exceptions (e.g., invalid host)
+            error_text = Text(f"An error occurred: {str(e)}", style="bold red")
+            console.print(error_text)
+    console.print(table)
 
 
 def main():
